@@ -1,0 +1,60 @@
+.app {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+}
+
+.budget-section {
+  border: 1px solid #ddd;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.section-header {
+  background: #f4f4f4;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.section-header .add-item-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.section-header:hover .add-item-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.budget-form {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  flex-wrap: wrap;
+}
+
+.budget-form input {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.black-button {
+  background-color: black;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.budget-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid #eee;
+}
