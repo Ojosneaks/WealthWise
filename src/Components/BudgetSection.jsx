@@ -92,9 +92,13 @@ function BudgetSection({
         <h2 style={{ flex: 1 }}>
           {title} <span style={{ fontWeight: "normal", fontSize: "1rem" }}>(${categoryTotal.toFixed(2)})</span>
         </h2>
-        <span className="arrow">{isOpen ? "⌄" : "⌃"}</span>
+        <span className="arrow" style={{ cursor: "pointer", userSelect: "none"}}
+        onClick={toggleOpen}
+        >
+        {isOpen ? "⌄" : "⌃"}
+        </span>
         <button
-          className="black-button"
+          className="add-items"
           style={{ marginLeft: "1rem" }}
           onClick={e => {
             e.stopPropagation();
@@ -166,7 +170,7 @@ function BudgetSection({
                           <button style={{ marginLeft: "0.5rem" }} onClick={() => setPresetEditing(null)}>Cancel</button>
                         </>
                       ) : (
-                        <button style={{ marginLeft: "1rem" }} onClick={() => setPresetEditing(item.category)}>
+                        <button className="add-amount" style={{ marginLeft: "1rem" }} onClick={() => setPresetEditing(item.category)}>
                           Add Amount
                         </button>
                       )
@@ -182,7 +186,11 @@ function BudgetSection({
                     Edit
                   </button>
                 )}
-                <button style={{ marginLeft: "0.5rem", color: "red" }} onClick={() => handleDelete(item)}>
+                <button
+                  className="delete-btn"
+                  style={{ marginLeft: "0.5rem" }}
+                  onClick={() => handleDelete(item)}
+                >
                   Delete
                 </button>
               </div>

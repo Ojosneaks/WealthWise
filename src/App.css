@@ -1,60 +1,151 @@
 .app {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-family: Arial, sans-serif;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
 }
 
 .budget-section {
-  border: 1px solid #ddd;
-  margin-bottom: 1rem;
-  border-radius: 10px;
-  overflow: hidden;
+    border: 1px solid #ddd;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .section-header {
-  background: #f4f4f4;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  cursor: pointer;
+    background: #f4f4f4;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
 }
 
 .section-header .add-item-btn {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
 }
 
 .section-header:hover .add-item-btn {
-  opacity: 1;
-  pointer-events: auto;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .budget-form {
-  display: flex;
-  gap: 0.5rem;
-  padding: 1rem;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+    flex-wrap: wrap;
 }
 
 .budget-form input {
-  flex: 1;
-  padding: 0.5rem;
+    flex: 1;
+    padding: 0.5rem;
 }
 
-.black-button {
-  background-color: black;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+.add-items {
+    background-color: #000 !important;
+    color: #fff;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.add-items:hover {
+    background-color: #4e4f50 !important;
+    color: #fff;
+}
+
+.add-items:active {
+    transform: scale(0.95);
 }
 
 .budget-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    border-top: 1px solid #eee;
+}
+
+.budget-section button,
+.section-header .black-button {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 1rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.budget-section button:active,
+.section-header .black-button:active,
+.delete-btn:active {
+    transform: scale(0.95);
+}
+.add-amount:hover{
+  background: #73b4f5;
+}
+.delete-btn {
+    background: #e53935;
+}
+
+.delete-btn:hover {
+    background: #b71c1c;
+}
+
+.budget-header {
   display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  border-top: 1px solid #eee;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.bank-balance-summary {
+  background: #f8fafc;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  padding: 2rem 2.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bank-balance label {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.balance-numbers {
+  display: flex;
+  gap: 2.5rem;
+  margin-top: 1.5rem;
+}
+
+.balance-label {
+  display: block;
+  font-size: 1.1rem;
+  color: #888;
+  margin-bottom: 0.25rem;
+}
+
+.balance-value {
+  font-size: 2.2rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  display: block;
+}
+
+.balance-value.assigned {
+  color: #1976d2;
+}
+
+.balance-value.unassigned {
+  color: #e53935;
 }

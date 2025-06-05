@@ -49,22 +49,32 @@ function App() {
 
   return (
     <div className="app">
-      <h1>My Budget</h1>
-      <div style={{ marginBottom: "1.5rem" }}>
-        <label>
-          Bank Balance: $
-          <input
-            type="number"
-            value={bankBalance}
-            onChange={e => setBankBalance(e.target.value)}
-            min="0"
-            step="0.01"
-            style={{ marginLeft: "0.5rem", width: "120px" }}
-          />
-        </label>
-        <div style={{ marginTop: "0.5rem" }}>
-          <strong>Assigned:</strong> ${totalAssigned.toFixed(2)}<br />
-          <strong>Unassigned:</strong> ${unassigned.toFixed(2)}
+      <div className="budget-header">
+        <h1>My Budget</h1>
+        <div className="bank-balance-summary">
+          <div className="bank-balance">
+            <label>
+              Bank Balance: $
+              <input
+                type="number"
+                value={bankBalance}
+                onChange={e => setBankBalance(e.target.value)}
+                min="0"
+                step="0.01"
+                style={{ marginLeft: "0.5rem", width: "120px" }}
+              />
+            </label>
+          </div>
+          <div className="balance-numbers">
+            <div>
+              <span className="balance-label">Assigned</span>
+              <span className="balance-value assigned">${totalAssigned.toFixed(2)}</span>
+            </div>
+            <div>
+              <span className="balance-label">Unassigned</span>
+              <span className="balance-value unassigned">${unassigned.toFixed(2)}</span>
+            </div>
+          </div>
         </div>
       </div>
       {DEFAULT_CATEGORIES.map((cat) => {
