@@ -1,80 +1,102 @@
 import { useState } from "react";
 
-function BudgetSection({ title, presetCategories = [] }) {
+function BudgetSection({
+  title,
+  items,
+  onAddItem,
+  onEditItem,
+  onDeleteItem,
+  presetCategories = [],
+  categoryTotal,
+}) {
   const [isOpen, setIsOpen] = useState(true);
-  // Start with preset categories, each with editable category and amount
-  const [items, setItems] = useState(
-    presetCategories.map((cat) => ({
-      id: Date.now() + Math.random(),
-      category: cat,
-      amount: "",
-      isEditing: false,
-    }))
-  );
   const [showForm, setShowForm] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [newAmount, setNewAmount] = useState("");
+  const [editId, setEditId] = useState(null);
+  const [editCategory, setEditCategory] = useState("");
+  const [editAmount, setEditAmount] = useState("");
+  const [presetEditing, setPresetEditing] = useState(null);
+  const [presetAmount, setPresetAmount] = useState("");
+  const [hiddenPresets, setHiddenPresets] = useState([]); // Track deleted presets
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
-  // Edit handlers
-  const handleEdit = (id) => {
-    setItems(
-      items.map((item) =>
-        item.id === id ? { ...item, isEditing: true } : item
+  // Merge preset categories and user-added categories
+  // Only filter out preset categories that are NOT hidden
+  const customItems = items.filter(
+    (item) =>
+      !(
+        presetCategories.includes(item.category) &&
+        !hiddenPresets.includes(item.category)
       )
-    );
-  };
+  );
 
-  const handleSave = (id, category, amount) => {
-    setItems(
-      items.map((item) =>
-        item.id === id
-          ? { ...item, category, amount, isEditing: false }
-          : item
-      )
-    );
-  };
+  const visiblePresets = presetCategories.filter(
+    (cat) => !hiddenPresets.includes(cat)
+  );
+  const mergedItems = [
+    ...visiblePresets.map((cat) => {
+      const found = items.find((item) => item.category === cat);
+      return (
+        found || {
+          id: cat,
+          category: cat,
+          amount: "",
+          isPreset: true,
+        }
+      );
+    }),
+    ...customItems,
+  ];
 
-  const handleCancel = (id) => {
-    setItems(
-      items.map((item) =>
-        item.id === id ? { ...item, isEditing: false } : item
-      )
-    );
-  };
-
-  // Add new item
   const handleAddItem = (e) => {
     e.preventDefault();
     if (!newCategory || !newAmount) return;
-    setItems([
-      ...items,
-      {
-        id: Date.now() + Math.random(),
-        category: newCategory,
-        amount: parseFloat(newAmount),
-        isEditing: false,
-      },
-    ]);
+    onAddItem({
+      id: Date.now() + Math.random(),
+      category: newCategory,
+      amount: parseFloat(newAmount),
+    });
     setNewCategory("");
     setNewAmount("");
     setShowForm(false);
   };
 
+  const handlePresetSave = (category) => {
+    if (!presetAmount) return;
+    onAddItem({
+      id: Date.now() + Math.random(),
+      category,
+      amount: parseFloat(presetAmount),
+    });
+    setPresetEditing(null);
+    setPresetAmount("");
+  };
+
+  const handleDelete = (item) => {
+    if (presetCategories.includes(item.category)) {
+      setHiddenPresets((prev) => [...prev, item.category]);
+      // Optionally, also remove from items if it was assigned
+      if (item.amount !== "") {
+        onDeleteItem(item.id);
+      }
+    } else {
+      onDeleteItem(item.id);
+    }
+  };
+
   return (
     <div className="budget-section">
-      <div
-        className="section-header"
-        onClick={toggleOpen}
-        style={{ display: "flex", alignItems: "center" }}
-      >
-        <h2 style={{ flex: 1 }}>{title}</h2>
+      <div className="section-header" style={{ display: "flex", alignItems: "center" }}>
+        <h2 style={{ flex: 1 }}>
+          {title} <span style={{ fontWeight: "normal", fontSize: "1rem" }}>(${categoryTotal.toFixed(2)})</span>
+        </h2>
         <span className="arrow">{isOpen ? "⌄" : "⌃"}</span>
         <button
           className="black-button"
           style={{ marginLeft: "1rem" }}
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             setShowForm(true);
           }}
@@ -85,56 +107,37 @@ function BudgetSection({ title, presetCategories = [] }) {
 
       {isOpen && (
         <div className="section-content">
-          {items.map((item) =>
-            item.isEditing ? (
+          {mergedItems.map((item) =>
+            editId === item.id ? (
               <form
                 key={item.id}
-                onSubmit={(e) => {
+                onSubmit={e => {
                   e.preventDefault();
-                  handleSave(item.id, item.category, item.amount);
+                  onEditItem(item.id, { category: editCategory, amount: parseFloat(editAmount) });
+                  setEditId(null);
+                  setEditCategory("");
+                  setEditAmount("");
                 }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "0.5rem",
-                }}
+                style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem" }}
               >
                 <input
                   type="text"
-                  value={item.category}
-                  onChange={(e) =>
-                    setItems(
-                      items.map((i) =>
-                        i.id === item.id
-                          ? { ...i, category: e.target.value }
-                          : i
-                      )
-                    )
-                  }
+                  value={editCategory}
+                  onChange={e => setEditCategory(e.target.value)}
                   required
                   style={{ marginRight: "0.5rem" }}
                 />
                 <input
                   type="number"
-                  value={item.amount}
-                  onChange={(e) =>
-                    setItems(
-                      items.map((i) =>
-                        i.id === item.id ? { ...i, amount: e.target.value } : i
-                      )
-                    )
-                  }
+                  value={editAmount}
+                  onChange={e => setEditAmount(e.target.value)}
                   required
                   min="0"
                   step="0.01"
                   style={{ marginRight: "0.5rem", width: "80px" }}
                 />
                 <button type="submit">Save</button>
-                <button
-                  type="button"
-                  onClick={() => handleCancel(item.id)}
-                  style={{ marginLeft: "0.5rem" }}
-                >
+                <button type="button" onClick={() => setEditId(null)} style={{ marginLeft: "0.5rem" }}>
                   Cancel
                 </button>
               </form>
@@ -142,23 +145,45 @@ function BudgetSection({ title, presetCategories = [] }) {
               <div
                 className="budget-item"
                 key={item.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "0.5rem",
-                }}
+                style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem" }}
               >
                 <span style={{ flex: 1 }}>{item.category}</span>
                 <span style={{ marginLeft: "1rem", minWidth: "80px" }}>
-                  {item.amount !== ""
+                  {item.amount !== "" && item.amount !== undefined
                     ? `$${Number(item.amount).toFixed(2)}`
-                    : "No Amount"}
+                    : (
+                      presetEditing === item.category ? (
+                        <>
+                          <input
+                            type="number"
+                            value={presetAmount}
+                            onChange={e => setPresetAmount(e.target.value)}
+                            min="0"
+                            step="0.01"
+                            style={{ width: "80px" }}
+                          />
+                          <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePresetSave(item.category)}>Save</button>
+                          <button style={{ marginLeft: "0.5rem" }} onClick={() => setPresetEditing(null)}>Cancel</button>
+                        </>
+                      ) : (
+                        <button style={{ marginLeft: "1rem" }} onClick={() => setPresetEditing(item.category)}>
+                          Add Amount
+                        </button>
+                      )
+                    )
+                  }
                 </span>
-                <button
-                  style={{ marginLeft: "1rem" }}
-                  onClick={() => handleEdit(item.id)}
-                >
-                  Edit
+                {item.amount !== "" && (
+                  <button style={{ marginLeft: "1rem" }} onClick={() => {
+                    setEditId(item.id);
+                    setEditCategory(item.category);
+                    setEditAmount(item.amount);
+                  }}>
+                    Edit
+                  </button>
+                )}
+                <button style={{ marginLeft: "0.5rem", color: "red" }} onClick={() => handleDelete(item)}>
+                  Delete
                 </button>
               </div>
             )
@@ -166,17 +191,13 @@ function BudgetSection({ title, presetCategories = [] }) {
           {showForm && (
             <form
               onSubmit={handleAddItem}
-              style={{
-                marginTop: "1rem",
-                display: "flex",
-                alignItems: "center",
-              }}
+              style={{ marginTop: "1rem", display: "flex", alignItems: "center" }}
             >
               <input
                 type="text"
                 placeholder="Category"
                 value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
+                onChange={e => setNewCategory(e.target.value)}
                 required
                 style={{ marginRight: "0.5rem" }}
               />
@@ -184,7 +205,7 @@ function BudgetSection({ title, presetCategories = [] }) {
                 type="number"
                 placeholder="Amount"
                 value={newAmount}
-                onChange={(e) => setNewAmount(e.target.value)}
+                onChange={e => setNewAmount(e.target.value)}
                 required
                 min="0"
                 step="0.01"

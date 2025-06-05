@@ -4,14 +4,25 @@ import "./App.css";
 
 const DEFAULT_CATEGORIES = ["Bills", "Needs", "Wants", "Savings"];
 const BILLS_PRESET = ["Music", "Insurance", "Phone", "Internet", "Utilities"];
+const NEEDS_PRESET = ["Grocceries", "Gas", "Transportation"];
+const WANTS_PRESET = ["Entertainment", "Clothes", "Dining Out", "Miscellaneous"];
+const SAVINGS_PRESET = ["Investment" , "Emergency Fund", "Short-term Fund"];
 
 function App() {
+  const [bankBalance, setBankBalance] = useState("");
   const [budgetData, setBudgetData] = useState({
     Bills: [],
     Needs: [],
     Wants: [],
     Savings: []
   });
+
+  // Calculate total assigned
+  const totalAssigned = Object.values(budgetData)
+    .flat()
+    .reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+
+  const unassigned = (parseFloat(bankBalance) || 0) - totalAssigned;
 
   const addItem = (category, item) => {
     setBudgetData((prev) => ({
@@ -20,18 +31,66 @@ function App() {
     }));
   };
 
+  const editItem = (category, id, updates) => {
+    setBudgetData(prev => ({
+      ...prev,
+      [category]: prev[category].map(item =>
+        item.id === id ? { ...item, ...updates } : item
+      )
+    }));
+  };
+
+  const deleteItem = (category, id) => {
+    setBudgetData(prev => ({
+      ...prev,
+      [category]: prev[category].filter(item => item.id !== id)
+    }));
+  };
+
   return (
     <div className="app">
       <h1>My Budget</h1>
-      {DEFAULT_CATEGORIES.map((cat) => (
-        <BudgetSection
-          key={cat}
-          title={cat}
-          items={budgetData[cat]}
-          onAddItem={(item) => addItem(cat, item)}
-          presetCategories={cat === "Bills" ? BILLS_PRESET : []}
-        />
-      ))}
+      <div style={{ marginBottom: "1.5rem" }}>
+        <label>
+          Bank Balance: $
+          <input
+            type="number"
+            value={bankBalance}
+            onChange={e => setBankBalance(e.target.value)}
+            min="0"
+            step="0.01"
+            style={{ marginLeft: "0.5rem", width: "120px" }}
+          />
+        </label>
+        <div style={{ marginTop: "0.5rem" }}>
+          <strong>Assigned:</strong> ${totalAssigned.toFixed(2)}<br />
+          <strong>Unassigned:</strong> ${unassigned.toFixed(2)}
+        </div>
+      </div>
+      {DEFAULT_CATEGORIES.map((cat) => {
+        const categoryTotal = budgetData[cat].reduce(
+          (sum, item) => sum + (parseFloat(item.amount) || 0),
+          0
+        );
+        return (
+          <BudgetSection
+            key={cat}
+            title={cat}
+            items={budgetData[cat]}
+            onAddItem={item => addItem(cat, item)}
+            onEditItem={(id, updates) => editItem(cat, id, updates)}
+            onDeleteItem={id => deleteItem(cat, id)}
+            presetCategories={
+              cat === "Bills" ? BILLS_PRESET :
+              cat === "Needs" ? NEEDS_PRESET :
+              cat === "Wants" ? WANTS_PRESET :
+              cat === "Savings" ? SAVINGS_PRESET :
+              []
+            }
+            categoryTotal={categoryTotal}
+          />
+        );
+      })}
     </div>
   );
 }
