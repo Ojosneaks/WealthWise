@@ -3,17 +3,20 @@
     margin: 0 auto;
     padding: 2rem;
     font-family: Arial, sans-serif;
+    background: #fdf6e3; /* Tan background */
+    min-height: 100vh;
 }
 
 .budget-section {
-    border: 1px solid #ddd;
+    border: 1px solid #e0c9a6;
     margin-bottom: 1rem;
     border-radius: 10px;
     overflow: hidden;
+    background: #f7ecd7; /* Lighter tan for sections */
 }
 
 .section-header {
-    background: #f4f4f4;
+    background: #f3e3c3;
     padding: 1rem;
     display: flex;
     justify-content: space-between;
@@ -107,14 +110,14 @@
 }
 
 .bank-balance-summary {
-  background: #f8fafc;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  padding: 2rem 2.5rem;
-  margin-bottom: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    background: #f3e3c3;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .bank-balance label {
@@ -148,4 +151,23 @@
 
 .balance-value.unassigned {
   color: #e53935;
+}
+
+input[type="number"],
+input[type="text"] {
+  padding: 0.6rem 1rem;
+  border: 1.5px solid #bfc9d1;
+  border-radius: 6px;
+  background: #f7ecd7;
+  font-size: 1.1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  margin-bottom: 0.5rem;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px #1976d233;
+  background: #fff;
 }

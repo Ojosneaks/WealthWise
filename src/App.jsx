@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BudgetSection from "./Components/BudgetSection";
 import "./App.css";
 
@@ -9,13 +9,17 @@ const WANTS_PRESET = ["Entertainment", "Clothes", "Dining Out", "Miscellaneous"]
 const SAVINGS_PRESET = ["Investment" , "Emergency Fund", "Short-term Fund"];
 
 function App() {
-  const [bankBalance, setBankBalance] = useState("");
-  const [budgetData, setBudgetData] = useState({
-    Bills: [],
-    Needs: [],
-    Wants: [],
-    Savings: []
+  // Load from localStorage or use defaults
+  const [bankBalance, setBankBalance] = useState(() =>
+    localStorage.getItem("bankBalance") || ""
+  );
+  const [budgetData, setBudgetData] = useState(() => {
+    const saved = localStorage.getItem("budgetData");
+    return saved
+      ? JSON.parse(saved)
+      : { Bills: [], Needs: [], Wants: [], Savings: [] };
   });
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   // Calculate total assigned
   const totalAssigned = Object.values(budgetData)
@@ -46,6 +50,50 @@ function App() {
       [category]: prev[category].filter(item => item.id !== id)
     }));
   };
+
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    localStorage.setItem("bankBalance", bankBalance);
+  }, [bankBalance]);
+
+  useEffect(() => {
+    localStorage.setItem("budgetData", JSON.stringify(budgetData));
+  }, [budgetData]);
+
+  useEffect(() => {
+    // Only set if not already set
+    if (!localStorage.getItem("authExpiresAt")) {
+      const expiresAt = Date.now() + 1000 * 60 * 60; // 1 hour from now
+      localStorage.setItem("authExpiresAt", expiresAt);
+    }
+  }, []);
+
+  useEffect(() => {
+    const checkExpiry = () => {
+      const expiresAt = localStorage.getItem("authExpiresAt");
+      if (expiresAt && Date.now() > Number(expiresAt)) {
+        // Session expired
+        localStorage.removeItem("authExpiresAt");
+        localStorage.removeItem("bankBalance");
+        localStorage.removeItem("budgetData");
+        setSessionExpired(true);
+      }
+    };
+
+    checkExpiry(); // Check on mount
+
+    const interval = setInterval(checkExpiry, 10000); // Check every 10 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  if (sessionExpired) {
+    return (
+      <div className="app" style={{ textAlign: "center", marginTop: "5rem" }}>
+        <h2>Your session has expired.</h2>
+        <p>Please log in again to continue.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
